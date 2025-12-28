@@ -1,0 +1,295 @@
+{
+  "version": "1.0",
+  "export_type": "menu_items",
+  "timestamp": "2025-09-26T14:22:15.748158",
+  "menu_items": [
+    {
+      "id": 1,
+      "name": "Kaffee",
+      "price": 2.80,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 2,
+      "name": "Grüner Tee",
+      "price": 2.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 3,
+      "name": "Heisse Schokolade",
+      "price": 3.20,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 4,
+      "name": "Cappuccino",
+      "price": 3.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 5,
+      "name": "Latte Macchiato",
+      "price": 4.20,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 6,
+      "name": "Espresso",
+      "price": 2.30,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 7,
+      "name": "Mineralwasser",
+      "price": 1.80,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 8,
+      "name": "Apfelsaft",
+      "price": 2.90,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 9,
+      "name": "Orangensaft",
+      "price": 3.10,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 10,
+      "name": "Coca Cola",
+      "price": 2.60,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 11,
+      "name": "Isotonisches Getränk",
+      "price": 3.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 12,
+      "name": "Energy Drink",
+      "price": 4.20,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 13,
+      "name": "Leberwurst Stulle",
+      "price": 3.80,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 14,
+      "name": "Käsebrot",
+      "price": 3.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 15,
+      "name": "Schinkenbrot",
+      "price": 4.20,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 16,
+      "name": "Bratwurst",
+      "price": 4.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 17,
+      "name": "Currywurst",
+      "price": 5.20,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 18,
+      "name": "Bockwurst",
+      "price": 3.80,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 19,
+      "name": "Döner Kebab",
+      "price": 6.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 20,
+      "name": "Schnitzel",
+      "price": 8.90,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 21,
+      "name": "Sauerbraten",
+      "price": 12.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 22,
+      "name": "Hamburger",
+      "price": 7.20,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 23,
+      "name": "Pommes Frites",
+      "price": 3.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 24,
+      "name": "Kartoffelsalat",
+      "price": 4.80,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 25,
+      "name": "Brezel",
+      "price": 2.20,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 26,
+      "name": "Lebkuchen",
+      "price": 2.80,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 27,
+      "name": "Schokolade",
+      "price": 2.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 28,
+      "name": "Erdnüsse",
+      "price": 3.20,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 29,
+      "name": "Salzstangen",
+      "price": 2.10,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 30,
+      "name": "Apfel",
+      "price": 1.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 31,
+      "name": "Protein Riegel",
+      "price": 3.80,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 32,
+      "name": "Regenerationsgetränk",
+      "price": 4.90,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 33,
+      "name": "Handtuch Miete",
+      "price": 2.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 34,
+      "name": "Ausrüstung Miete",
+      "price": 8.00,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 35,
+      "name": "Sport Gel",
+      "price": 2.70,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    },
+    {
+      "id": 36,
+      "name": "Elektrolyt Pulver",
+      "price": 4.50,
+      "vat_rate": 19.0,
+      "print_receipt": true,
+      "active": true
+    }
+  ]
+}
