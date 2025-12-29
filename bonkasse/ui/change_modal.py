@@ -26,15 +26,12 @@ class ChangeModal:
         self.window.title("Change Calculator")
         self.window.geometry(f"{window_width}x{window_height}")
         self.window.configure(bg=colors['bg_primary'])
-        self.window.transient(parent)
-        self.window.grab_set()
 
-        self.window.geometry(f"{window_width}x{window_height}")
+        self.window.withdraw()
+
+        self.window.transient(parent)
 
         self.window.bind("<Button-1>", self.close_modal)
-
-        self.window.focus_set()
-        self.window.focus_force()
 
         self.window.attributes('-topmost', True)
 
@@ -43,6 +40,20 @@ class ChangeModal:
         self.create_ui()
 
         self.center_window()
+
+        try:
+            self.window.iconbitmap("assets/icon.ico")
+        except tk.TclError:
+            try:
+                icon_photo = tk.PhotoImage(file="assets/icon.png")
+                self.window.iconphoto(True, icon_photo)
+            except tk.TclError:
+                pass
+
+        self.window.deiconify()
+        self.window.grab_set()
+        self.window.focus_set()
+        self.window.focus_force()
 
     def create_ui(self):
         """Create the modal UI"""
@@ -188,5 +199,6 @@ class ChangeModal:
 
 
 if __name__ == "__main__":
-    from .exceptions import DoNotRunDirectly
-    raise DoNotRunDirectly(__name__)
+    import sys
+    print(f"Error: This module should not be run directly. Please run main.py instead.")
+    sys.exit(1)

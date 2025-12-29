@@ -1,14 +1,9 @@
-"""
-Password dialog for settings access
-"""
-
 import tkinter as tk
 from tkinter import messagebox
 import hashlib
 
 
 class PasswordDialog:
-    """Simple password input dialog"""
 
     def __init__(self, parent, colors, title="Enter Password"):
         self.parent = parent
@@ -146,5 +141,6 @@ class PasswordDialog:
 
 
 if __name__ == "__main__":
-    from ..exceptions import DoNotRunDirectly
-    raise DoNotRunDirectly(__name__)
+    import sys
+    print(f"Error: This module should not be run directly. Please run main.py instead.")
+    sys.exit(1)

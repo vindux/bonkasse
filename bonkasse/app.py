@@ -36,8 +36,6 @@ class BonkasseApp:
 
         self.root.attributes('-fullscreen', True)
         self.root.resizable(False, False)
-        
-        # self.root.overrideredirect(True)  # Commented out to maintain taskbar presence
 
         self.colors = {
             'bg_primary': '#f8f9fa',
@@ -47,6 +45,7 @@ class BonkasseApp:
             'text_secondary': '#6c757d',
             'accent': '#0d6efd',
             'accent_hover': "#9cb9e4",
+            'click_bg': '#0056b3',
             'success': '#198754',
             'warning': '#ffc107',
             'danger': '#dc3545',
@@ -122,7 +121,7 @@ class BonkasseApp:
                                  relief='flat', bd=0, cursor='hand2')
         self.clear_all_btn.pack(fill=tk.X, pady=2, padx=5, ipady=12)
 
-        self.print_last_order_btn = tk.Button(action_frame, text="Print Last Order", command=self._on_print_last_order,
+        self.print_last_order_btn = tk.Button(action_frame, text="Print Receipt", command=self._on_print_last_order,
                                             font=('Arial', 9, 'bold'), fg='white', bg=self.colors['success'],
                                             relief='flat', bd=0, cursor='hand2')
         self.print_last_order_btn.pack(fill=tk.X, pady=(2, 5), padx=5, ipady=12)
@@ -337,10 +336,10 @@ class BonkasseApp:
         printer_service.print_receipt(printer_items, total_amount)
 
     def _on_print_last_order(self):
-        """Handle print last order"""
+        """Handle print last order receipt"""
         transactions = self.database.get_all_transactions()
         if not transactions:
-            messagebox.showinfo("Print Last Order", "No previous orders found.")
+            messagebox.showinfo("Print Last Order Receipt", "No previous orders found.")
             return
 
         last_transaction = transactions[0]
@@ -655,5 +654,6 @@ class BonkasseApp:
 
 
 if __name__ == "__main__":
-    from .exceptions import DoNotRunDirectly
-    raise DoNotRunDirectly(__name__)
+    import sys
+    print(f"Error: This module should not be run directly. Please run main.py instead.")
+    sys.exit(1)

@@ -112,15 +112,17 @@ class SettingsWindow:
         list_frame = tk.Frame(self.menu_frame, bg=self.colors['bg_secondary'])
         list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-        columns = ("Name", "Price", "VAT %", "Receipt", "Active")
+        columns = ("#", "Name", "Price", "VAT %", "Receipt", "Active")
         self.menu_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=12)
 
+        self.menu_tree.heading("#", text="#")
         self.menu_tree.heading("Name", text="Name")
         self.menu_tree.heading("Price", text="Price")
         self.menu_tree.heading("VAT %", text="VAT %")
         self.menu_tree.heading("Receipt", text="Receipt")
         self.menu_tree.heading("Active", text="Active")
 
+        self.menu_tree.column("#", width=40, minwidth=40)
         self.menu_tree.column("Name", width=250, minwidth=200)
         self.menu_tree.column("Price", width=100, minwidth=80)
         self.menu_tree.column("VAT %", width=80, minwidth=60)
@@ -458,14 +460,9 @@ class SettingsWindow:
         tk.Label(right_frame, text="VAT Rate:", font=('Arial', 10, 'bold'),
                 fg=self.colors['text_primary'], bg=self.colors['bg_accent']).grid(row=0, column=0, sticky=tk.W, pady=2)
 
-        self.current_item_vars['vat_rate'] = tk.StringVar(value="0.0")
+        self.current_item_vars['vat_rate'] = tk.StringVar(value="19.0")
         vat_frame = tk.Frame(right_frame, bg=self.colors['bg_accent'])
         vat_frame.grid(row=0, column=1, sticky=tk.W, padx=(10, 0), pady=2)
-
-        vat_0 = tk.Radiobutton(vat_frame, text="0%", variable=self.current_item_vars['vat_rate'], value="0.0",
-                              font=('Arial', 10), fg=self.colors['text_primary'], bg=self.colors['bg_accent'],
-                              selectcolor=self.colors['bg_accent'], command=self.on_field_change)
-        vat_0.pack(side=tk.LEFT, padx=(0, 10))
 
         vat_7 = tk.Radiobutton(vat_frame, text="7%", variable=self.current_item_vars['vat_rate'], value="7.0",
                               font=('Arial', 10), fg=self.colors['text_primary'], bg=self.colors['bg_accent'],
@@ -506,8 +503,9 @@ class SettingsWindow:
 
         self.menu_items_data = {}
 
-        for item in items:
+        for idx, item in enumerate(items):
             item_id, name, price, vat_rate, print_receipt, active = item
+            item_number = idx + 1
             self.menu_items_data[name] = {
                 'id': item_id,
                 'name': name,
@@ -519,6 +517,7 @@ class SettingsWindow:
 
             row_tag = 'evenrow' if len(self.menu_tree.get_children()) % 2 == 0 else 'oddrow'
             self.menu_tree.insert("", "end", values=(
+                item_number,
                 name,
                 f"{price:.2f} €",
                 f"{vat_rate:.1f}%",
@@ -534,7 +533,7 @@ class SettingsWindow:
             item = self.menu_tree.item(self.selected_tree_item)
             values = item['values']
 
-            item_name = values[0]
+            item_name = values[1]
 
             if item_name in self.menu_items_data:
                 item_data = self.menu_items_data[item_name]
@@ -573,8 +572,11 @@ class SettingsWindow:
         print_receipt = self.current_item_vars['print_receipt'].get()
         active = self.current_item_vars['active'].get()
 
+        item_number = self.selected_item_id
+
         display_name = name if name else "[Empty Slot]"
         self.menu_tree.item(self.selected_tree_item, values=(
+            item_number,
             display_name,
             f"{price:.2f} €",
             f"{vat_rate:.1f}%",
@@ -1570,5 +1572,6 @@ class SettingsWindow:
 
 
 if __name__ == "__main__":
-    from ..exceptions import DoNotRunDirectly
-    raise DoNotRunDirectly(__name__)
+    import sys
+    print(f"Error: This module should not be run directly. Please run main.py instead.")
+    sys.exit(1)

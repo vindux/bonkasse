@@ -52,5 +52,6 @@ class ReceiptService:
 
 
 if __name__ == "__main__":
-    from ..exceptions import DoNotRunDirectly
-    raise DoNotRunDirectly(__name__)
+    import sys
+    print(f"Error: This module should not be run directly. Please run main.py instead.")
+    sys.exit(1)

@@ -36,7 +36,7 @@ class TransactionPanel(BaseComponent):
 
         self.listbox = tk.Listbox(
             listbox_frame,
-            font=('Courier New', 11),
+            font=('Courier New', 14),
             bg=self.colors['bg_primary'],
             fg=self.colors['text_primary'],
             selectbackground=self.colors['bg_primary'],
@@ -80,5 +80,6 @@ class TransactionPanel(BaseComponent):
 
 
 if __name__ == "__main__":
-    from ..exceptions import DoNotRunDirectly
-    raise DoNotRunDirectly(__name__)
+    import sys
+    print(f"Error: This module should not be run directly. Please run main.py instead.")
+    sys.exit(1)

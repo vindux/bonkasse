@@ -90,9 +90,20 @@ class MenuGrid(BaseComponent):
             )
             panel.grid(row=row, column=col, padx=2, pady=2, sticky="nsew", ipady=8)
 
+            item_number = i + 1
+            number_label = tk.Label(
+                panel,
+                text=str(item_number),
+                font=('Arial', 8),
+                fg=self.colors['text_secondary'],
+                bg=panel_bg,
+                cursor=cursor_style
+            )
+            number_label.place(x=2, y=2)
+
             inner_bg = panel_bg
             inner_frame = tk.Frame(panel, bg=inner_bg)
-            inner_frame.pack(fill=tk.BOTH, expand=True, padx=8, pady=4)
+            inner_frame.pack(fill=tk.BOTH, expand=True, padx=22, pady=4)
 
             if is_blank:
                 display_name = ""
@@ -106,6 +117,10 @@ class MenuGrid(BaseComponent):
             else:
                 display_name = name
                 name_color = self.colors['text_primary']
+
+            max_length = 70
+            if len(display_name) > max_length:
+                display_name = display_name[:max_length - 5].rstrip() + " (...)"
 
             name_label = tk.Label(
                 inner_frame,
@@ -150,24 +165,50 @@ class MenuGrid(BaseComponent):
                 'panel': panel,
                 'name_label': name_label,
                 'price_label': price_label,
-                'count_label': count_label
+                'count_label': count_label,
+                'number_label': number_label
             }
 
             if not is_empty and not is_blank and active and not self.system_mode:
-                def make_click_handler(id=item_id, n=name, p=price):
-                    return lambda event: self.on_item_click(id, n, p)
+                def make_click_handler(inner_item_id=item_id, inner_name=name, inner_price=price, inner_panel=panel, inner_inner_frame=inner_frame,
+                                       inner_name_label=name_label, inner_price_label=price_label, inner_count_label=count_label, inner_number_label=number_label):
+                    def handler(event):
+                        click_bg = self.colors.get('click_bg')
+                        for widget in [inner_panel, inner_inner_frame, inner_name_label]:
+                            widget.config(bg=click_bg)
+                        if inner_price_label:
+                            inner_price_label.config(bg=click_bg, fg='white')
+                        if inner_count_label:
+                            inner_count_label.config(bg=click_bg, fg='white')
+                        inner_number_label.config(bg=click_bg, fg='white')
+
+                        def restore():
+                            hover_bg = self.colors.get('accent_hover', self.colors['accent'])
+                            for widget in [inner_panel, inner_inner_frame, inner_name_label]:
+                                widget.config(bg=hover_bg)
+                            if inner_price_label:
+                                inner_price_label.config(bg=hover_bg, fg='white')
+                            if inner_count_label:
+                                inner_count_label.config(bg=hover_bg, fg='white')
+                            inner_number_label.config(bg=hover_bg, fg='white')
+
+                        inner_panel.after(100, restore)
+
+                        self.on_item_click(inner_item_id, inner_name, inner_price)
+                    return handler
 
                 click_handler = make_click_handler()
                 panel.bind("<Button-1>", click_handler)
                 inner_frame.bind("<Button-1>", click_handler)
                 name_label.bind("<Button-1>", click_handler)
+                number_label.bind("<Button-1>", click_handler)
                 if price_label:
                     price_label.bind("<Button-1>", click_handler)
                 if count_label:
                     count_label.bind("<Button-1>", click_handler)
 
             if not is_empty and not is_blank and active and not self.system_mode:
-                def make_hover_handlers(p, f, nl, pl, cl):
+                def make_hover_handlers(p, f, nl, pl, cl, numl):
                     def on_enter(event):
                         hover_bg = self.colors.get('accent_hover', self.colors['accent'])
                         for widget in [p, f, nl]:
@@ -177,6 +218,7 @@ class MenuGrid(BaseComponent):
                         if cl:
                             cl.config(bg=hover_bg, fg='white')
                         nl.config(fg='white')
+                        numl.config(bg=hover_bg, fg='white')
 
                     def on_leave(event):
                         for widget in [p, f, nl]:
@@ -186,12 +228,13 @@ class MenuGrid(BaseComponent):
                         if cl:
                             cl.config(bg=self.colors['bg_primary'], fg=self.colors['text_secondary'])
                         nl.config(fg=self.colors['text_primary'])
+                        numl.config(bg=self.colors['bg_primary'], fg=self.colors['text_secondary'])
 
                     return on_enter, on_leave
 
-                on_enter, on_leave = make_hover_handlers(panel, inner_frame, name_label, price_label, count_label)
+                on_enter, on_leave = make_hover_handlers(panel, inner_frame, name_label, price_label, count_label, number_label)
 
-                hover_widgets = [panel, inner_frame, name_label]
+                hover_widgets = [panel, inner_frame, name_label, number_label]
                 if price_label:
                     hover_widgets.append(price_label)
                 if count_label:
@@ -202,7 +245,7 @@ class MenuGrid(BaseComponent):
                     widget.bind("<Leave>", on_leave)
 
         for i in range(3):
-            grid_frame.columnconfigure(i, weight=1)
+            grid_frame.columnconfigure(i, weight=1, uniform="menu_columns")
 
         max_rows = (len(self.menu_items) + 2) // 3
         for i in range(max_rows):
@@ -457,5 +500,6 @@ class MenuGrid(BaseComponent):
 
 
 if __name__ == "__main__":
-    from ..exceptions import DoNotRunDirectly
-    raise DoNotRunDirectly(__name__)
+    import sys
+    print(f"Error: This module should not be run directly. Please run main.py instead.")
+    sys.exit(1)

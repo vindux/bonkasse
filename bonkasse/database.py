@@ -114,46 +114,46 @@ class BonkasseDatabase:
 
         if current_count == 0:
             sample_items = [
-                ("Coffee", 2.50),
-                ("Tea", 2.00),
-                ("Hot Chocolate", 3.00),
-                ("Cappuccino", 3.50),
-                ("Latte", 4.00),
-                ("Espresso", 2.25),
+                ("temp", 2.50),
+                ("temp", 2.00),
+                ("temp", 3.00),
+                ("temp", 3.50),
+                ("temp", 4.00),
+                ("temp", 2.25),
 
-                ("Water", 1.50),
-                ("Soda", 2.50),
-                ("Beer", 4.00),
-                ("Orange Juice", 3.00),
-                ("Sports Drink", 2.75),
-                ("Energy Drink", 3.50),
+                ("temp", 1.50),
+                ("temp", 2.50),
+                ("temp", 4.00),
+                ("temp", 3.00),
+                ("temp", 2.75),
+                ("temp", 3.50),
 
-                ("Club Sandwich", 6.50),
-                ("Cheeseburger", 7.00),
-                ("Caesar Salad", 5.50),
-                ("Chicken Wrap", 6.00),
-                ("Pizza Slice", 4.50),
-                ("Hot Dog", 3.50),
-                ("Fish & Chips", 8.50),
-                ("Pasta Bowl", 7.50),
-                ("Grilled Chicken", 9.00),
-                ("Veggie Burger", 6.50),
-                ("Quesadilla", 5.00),
-                ("Soup of the Day", 4.00),
+                ("temp", 6.50),
+                ("temp", 7.00),
+                ("temp", 5.50),
+                ("temp", 6.00),
+                ("temp", 4.50),
+                ("temp", 3.50),
+                ("temp", 8.50),
+                ("temp", 7.50),
+                ("temp", 9.00),
+                ("temp", 6.50),
+                ("temp", 5.00),
+                ("temp", 4.00),
 
-                ("Chips", 1.50),
-                ("Cookies", 2.00),
-                ("Candy Bar", 1.75),
-                ("Mixed Nuts", 2.50),
-                ("Crackers", 1.25),
-                ("Fresh Fruit", 2.00),
+                ("temp", 1.50),
+                ("temp", 2.00),
+                ("temp", 1.75),
+                ("temp", 2.50),
+                ("temp", 1.25),
+                ("temp", 2.00),
 
-                ("Protein Bar", 3.00),
-                ("Recovery Drink", 4.50),
-                ("Towel Rental", 2.00),
-                ("Equipment Rental", 5.00),
-                ("Sports Gel", 2.25),
-                ("Electrolyte Powder", 3.50)
+                ("temp", 3.00),
+                ("temp", 4.50),
+                ("temp", 2.00),
+                ("temp", 5.00),
+                ("temp", 2.25),
+                ("temp", 3.50)
             ]
             cursor.executemany(
                 "INSERT INTO menu_items (name, price) VALUES (?, ?)",
@@ -507,5 +507,6 @@ class BonkasseDatabase:
 
 
 if __name__ == "__main__":
-    from .exceptions import DoNotRunDirectly
-    raise DoNotRunDirectly(__name__)
+    import sys
+    print(f"Error: This module should not be run directly. Please run main.py instead.")
+    sys.exit(1)

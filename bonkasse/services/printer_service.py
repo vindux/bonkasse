@@ -221,12 +221,10 @@ class PrinterService:
                     self.printer.text(f"{event_name}\n")
                     self._print_separator()
 
-                    # self.printer.set(align='center', width=2, height=2)
                     self.printer.set(align='center', custom_size=True, width=2, height=2)
                     self.printer.text(f"{name}\n\n")
                     self.printer.set(align='center', custom_size=True, width=1, height=1)
                     self.printer.text(f"{price:.2f} €\n")
-                    # self._print_separator()
 
                     self.printer.cut()
 
@@ -415,5 +413,6 @@ class PrinterService:
 
 
 if __name__ == "__main__":
-    from ..exceptions import DoNotRunDirectly
-    raise DoNotRunDirectly(__name__)
+    import sys
+    print(f"Error: This module should not be run directly. Please run main.py instead.")
+    sys.exit(1)
