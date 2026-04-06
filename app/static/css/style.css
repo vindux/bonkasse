@@ -241,6 +241,13 @@ html, body {
     flex: 1;
 }
 
+.printer-status {
+    font-size: 16px;
+    margin-right: 4px;
+}
+.printer-status.ready { color: var(--success); }
+.printer-status.offline { color: var(--danger); }
+
 .btn {
     display: inline-block;
     padding: 12px 16px;

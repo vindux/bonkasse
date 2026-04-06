@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -10,6 +11,8 @@ from ..models import MenuItem, AppConfig, Transaction, TransactionItem
 from ..services.cart import get_cart, CartItem
 from ..dependencies import get_printer_service
 from ..services.printer_service import PrinterService
+
+log = logging.getLogger(__name__)
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
@@ -41,8 +44,14 @@ def _cart_context(db: DBSession) -> dict:
 
 
 @router.get("/", response_class=HTMLResponse)
-def register_page(request: Request, db: DBSession = Depends(get_db)):
+def register_page(
+    request: Request,
+    db: DBSession = Depends(get_db),
+    printer: PrinterService = Depends(get_printer_service),
+):
     ctx = _cart_context(db)
+    config = ctx["config"]
+    ctx["printer_ready"] = printer.is_printer_ready() if config and config.printer_enabled else None
     return templates.TemplateResponse(request, name="register.html", context=ctx)
 
 
@@ -99,20 +108,29 @@ def cart_finalize(
         return HTMLResponse(templates.get_template("fragments/cart.html").render(ctx))
 
     # Save transaction
-    txn = Transaction(total=cart.total)
-    db.add(txn)
-    db.flush()
+    try:
+        txn = Transaction(total=cart.total)
+        db.add(txn)
+        db.flush()
 
-    for cart_item in cart.items:
-        db.add(TransactionItem(
-            transaction_id=txn.id,
-            menu_item_id=cart_item.menu_item_id,
-            name=cart_item.name,
-            price=cart_item.price,
-            vat_rate=cart_item.vat_rate,
-            print_bon=cart_item.print_bon,
-        ))
-    db.commit()
+        for cart_item in cart.items:
+            db.add(TransactionItem(
+                transaction_id=txn.id,
+                menu_item_id=cart_item.menu_item_id,
+                name=cart_item.name,
+                price=cart_item.price,
+                vat_rate=cart_item.vat_rate,
+                print_bon=cart_item.print_bon,
+            ))
+        db.commit()
+    except Exception:
+        db.rollback()
+        log.exception("Failed to save transaction")
+        ctx = _cart_context(db)
+        cart_html = templates.get_template("fragments/cart.html").render(ctx)
+        total_html = templates.get_template("fragments/total_button.html").render(ctx)
+        oob = f'\n<div id="total-button" hx-swap-oob="innerHTML">{total_html}</div>'
+        return HTMLResponse(cart_html + oob)
 
     # Print individual bons for items with print_bon enabled
     bon_items = []
@@ -124,7 +142,10 @@ def cart_finalize(
                 "quantity": 1,
             })
     if bon_items:
-        printer.print_individual_items(bon_items)
+        try:
+            printer.print_individual_items(bon_items)
+        except Exception:
+            log.exception("Printer error during finalize")
 
     last_total = cart.total
     cart.clear()
@@ -139,14 +160,15 @@ def cart_finalize(
     oob += f'\n<div id="menu-grid" hx-swap-oob="innerHTML">{grid_html}</div>'
     oob += f'\n<div id="last-order" hx-swap-oob="innerHTML">{last_total:.2f}&nbsp;&euro;</div>'
 
+    # Show change modal if enabled
+    config = db.get(AppConfig, 1)
+    if config and config.change_enabled:
+        euro_notes = [5, 10, 20, 50, 100]
+        applicable = [(note, note - last_total) for note in euro_notes if note >= last_total]
+        change_html = templates.get_template("fragments/change_modal.html").render({
+            "total": last_total,
+            "notes": applicable,
+        })
+        oob += f'\n<div id="modal-container" hx-swap-oob="innerHTML">{change_html}</div>'
+
     return HTMLResponse(cart_html + oob)
-
-
-@router.get("/change-modal", response_class=HTMLResponse)
-def change_modal(request: Request, total: float):
-    euro_notes = [5, 10, 20, 50, 100]
-    applicable = [(note, note - total) for note in euro_notes if note >= total]
-    return templates.TemplateResponse(request, name="fragments/change_modal.html", context={
-        "total": total,
-        "notes": applicable,
-    })

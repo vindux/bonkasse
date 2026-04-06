@@ -23,15 +23,60 @@ def general_page(request: Request, db: DBSession = Depends(get_db)):
     })
 
 
-@router.post("", response_class=HTMLResponse)
-def save_general(
+def _general_response(request: Request, config, message: str, msg_type: str = "success"):
+    return templates.TemplateResponse(request, name="admin/general.html", context={
+        "config": config,
+        "active_tab": "general",
+        "message": message,
+        "msg_type": msg_type,
+    })
+
+
+@router.post("/event", response_class=HTMLResponse)
+def save_event(
     request: Request,
     title: str = Form(""),
+    db: DBSession = Depends(get_db),
+):
+    config = db.get(AppConfig, 1)
+    config.title = title.strip()
+    db.commit()
+    return _general_response(request, config, "Event settings saved.")
+
+
+@router.post("/business", response_class=HTMLResponse)
+def save_business(
+    request: Request,
     company_name: str = Form(""),
     company_address: str = Form(""),
     company_phone: str = Form(""),
     company_email: str = Form(""),
+    db: DBSession = Depends(get_db),
+):
+    config = db.get(AppConfig, 1)
+    config.company_name = company_name.strip()
+    config.company_address = company_address.strip()
+    config.company_phone = company_phone.strip()
+    config.company_email = company_email.strip()
+    db.commit()
+    return _general_response(request, config, "Business info saved.")
+
+
+@router.post("/change", response_class=HTMLResponse)
+def save_change(
+    request: Request,
     change_enabled: bool = Form(False),
+    db: DBSession = Depends(get_db),
+):
+    config = db.get(AppConfig, 1)
+    config.change_enabled = change_enabled
+    db.commit()
+    return _general_response(request, config, "Change settings saved.")
+
+
+@router.post("/printer", response_class=HTMLResponse)
+def save_printer(
+    request: Request,
     printer_enabled: bool = Form(False),
     printer_type: str = Form("usb"),
     printer_interface: str = Form(""),
@@ -39,24 +84,12 @@ def save_general(
     db: DBSession = Depends(get_db),
 ):
     config = db.get(AppConfig, 1)
-    config.title = title.strip()
-    config.company_name = company_name.strip()
-    config.company_address = company_address.strip()
-    config.company_phone = company_phone.strip()
-    config.company_email = company_email.strip()
-    config.change_enabled = change_enabled
     config.printer_enabled = printer_enabled
     config.printer_type = printer_type
     config.printer_interface = printer_interface.strip()
     config.cash_drawer_enabled = cash_drawer_enabled
     db.commit()
-
-    return templates.TemplateResponse(request, name="admin/general.html", context={
-        "config": config,
-        "active_tab": "general",
-        "message": "Settings saved successfully.",
-        "msg_type": "success",
-    })
+    return _general_response(request, config, "Printer settings saved.")
 
 
 @router.post("/password", response_class=HTMLResponse)
@@ -81,22 +114,11 @@ def set_password(
         error = "Password cannot be empty."
 
     if error:
-        return templates.TemplateResponse(request, name="admin/general.html", context={
-            "config": config,
-            "active_tab": "general",
-            "message": error,
-            "msg_type": "error",
-        })
+        return _general_response(request, config, error, "error")
 
     config.password_hash = hash_password(new_password)
     db.commit()
-
-    return templates.TemplateResponse(request, name="admin/general.html", context={
-        "config": config,
-        "active_tab": "general",
-        "message": "Password updated successfully.",
-        "msg_type": "success",
-    })
+    return _general_response(request, config, "Password updated successfully.")
 
 
 @router.post("/password/remove", response_class=HTMLResponse)
@@ -109,22 +131,11 @@ def remove_password(
 
     if config.password_hash:
         if not verify_password(current_password, config.password_hash):
-            return templates.TemplateResponse(request, name="admin/general.html", context={
-                "config": config,
-                "active_tab": "general",
-                "message": "Incorrect password.",
-                "msg_type": "error",
-            })
+            return _general_response(request, config, "Incorrect password.", "error")
 
     config.password_hash = None
     db.commit()
-
-    return templates.TemplateResponse(request, name="admin/general.html", context={
-        "config": config,
-        "active_tab": "general",
-        "message": "Password removed.",
-        "msg_type": "success",
-    })
+    return _general_response(request, config, "Password removed.")
 
 
 @router.post("/printer/test", response_class=HTMLResponse)
@@ -135,12 +146,8 @@ def test_printer(
 ):
     config = db.get(AppConfig, 1)
     success = printer.test_print()
-    return templates.TemplateResponse(request, name="admin/general.html", context={
-        "config": config,
-        "active_tab": "general",
-        "message": "Test print successful!" if success else "Test print failed. Check printer connection.",
-        "msg_type": "success" if success else "error",
-    })
+    msg = "Test print successful!" if success else "Test print failed. Check printer connection."
+    return _general_response(request, config, msg, "success" if success else "error")
 
 
 @router.post("/printer/test-drawer", response_class=HTMLResponse)
@@ -155,9 +162,4 @@ def test_drawer(
         msg, mtype = "Cash drawer command sent.", "success"
     else:
         msg, mtype = "Printer not ready.", "error"
-    return templates.TemplateResponse(request, name="admin/general.html", context={
-        "config": config,
-        "active_tab": "general",
-        "message": msg,
-        "msg_type": mtype,
-    })
+    return _general_response(request, config, msg, mtype)

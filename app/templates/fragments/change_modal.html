@@ -1,4 +1,4 @@
-<div class="modal-overlay">
+<div class="modal-overlay" id="change-overlay">
     <div class="modal-content change-modal">
         <h2 class="change-title">Total: {{ "%.2f"|format(total) }}&nbsp;&euro;</h2>
 
@@ -18,14 +18,6 @@
         <p class="change-exceed">Amount exceeds largest note denomination</p>
         {% endif %}
 
-        <button class="btn btn-success btn-large"
-                hx-post="/cart/finalize"
-                hx-target="#cart"
-                hx-swap="innerHTML"
-                onclick="document.getElementById('modal-container').innerHTML=''">
-            Confirm &amp; Print
-        </button>
-
-        <p class="change-hint">Click anywhere outside or press Escape to cancel</p>
+        <p class="change-hint">Press any key or tap anywhere to close</p>
     </div>
 </div>

@@ -5,6 +5,9 @@ document.addEventListener("keydown", function (e) {
     /* Only on register page */
     if (!document.getElementById("register-page")) return;
 
+    /* Skip shortcuts if change modal is showing (any key dismisses it instead) */
+    if (document.getElementById("change-overlay")) return;
+
     /* Enter = finalize (print receipt) */
     if (e.key === "Enter") {
         var btn = document.getElementById("finalize-btn");
@@ -20,19 +23,34 @@ document.addEventListener("keydown", function (e) {
     }
 });
 
-/* Close modal on click outside */
+/* Close change modal on ANY click or keypress */
+function dismissChangeModal() {
+    var modal = document.getElementById("modal-container");
+    if (modal && modal.innerHTML.trim()) {
+        modal.innerHTML = "";
+    }
+}
+
 document.addEventListener("click", function (e) {
-    if (e.target.classList.contains("modal-overlay")) {
-        document.getElementById("modal-container").innerHTML = "";
+    if (document.getElementById("change-overlay")) {
+        dismissChangeModal();
+    } else if (e.target.classList.contains("modal-overlay")) {
+        dismissChangeModal();
     }
 });
 
-/* Close modal on Escape */
 document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-        var modal = document.getElementById("modal-container");
-        if (modal && modal.innerHTML.trim()) {
-            modal.innerHTML = "";
+    var modal = document.getElementById("modal-container");
+    if (modal && modal.innerHTML.trim()) {
+        /* Change modal: any key dismisses */
+        if (document.getElementById("change-overlay")) {
+            e.preventDefault();
+            dismissChangeModal();
+            return;
+        }
+        /* Other modals: only Escape */
+        if (e.key === "Escape") {
+            dismissChangeModal();
         }
     }
 });

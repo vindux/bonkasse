@@ -1,11 +1,15 @@
+import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+
 from .database import init_db, SessionLocal
 from .models import AppConfig, MenuItem
 from .auth import _AdminRedirectException
+from .config import MENU_SLOTS
 
 
 def create_app() -> FastAPI:
@@ -39,8 +43,8 @@ def _seed_data():
             db.commit()
 
         count = db.query(MenuItem).count()
-        if count < 36:
-            for i in range(count + 1, 37):
+        if count < MENU_SLOTS:
+            for i in range(count + 1, MENU_SLOTS + 1):
                 db.add(MenuItem(slot_number=i, name="", price=0.0, active=False))
             db.commit()
     finally:

@@ -10,6 +10,7 @@ import io
 from ..database import get_db
 from ..models import MenuItem, AppConfig
 from ..auth import require_admin
+from ..config import MENU_SLOTS
 
 router = APIRouter(prefix="/admin/menu-items", dependencies=[Depends(require_admin)])
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
@@ -100,24 +101,37 @@ async def import_json(request: Request, file: UploadFile = File(...), db: DBSess
             raise ValueError("Invalid menu items export file")
 
         menu_data = data["menu_items"]
+        if not isinstance(menu_data, list):
+            raise ValueError("menu_items must be a list")
+
+        # Validate each item before modifying the database
+        for i, item_data in enumerate(menu_data):
+            if not isinstance(item_data, dict):
+                raise ValueError(f"Item {i + 1} is not a valid object")
+            price = float(item_data.get("price", 0.0))
+            if price < 0:
+                raise ValueError(f"Item {i + 1} has a negative price")
 
         # Clear and re-insert
         db.query(MenuItem).delete()
         db.flush()
 
         for i, item_data in enumerate(menu_data):
+            vat = float(item_data.get("vat_rate", 7.0))
+            if vat not in (7.0, 19.0):
+                vat = 7.0
             db.add(MenuItem(
                 slot_number=item_data.get("slot_number", i + 1),
-                name=item_data.get("name", ""),
-                price=float(item_data.get("price", 0.0)),
-                vat_rate=float(item_data.get("vat_rate", 0.0)),
+                name=str(item_data.get("name", "")),
+                price=max(0.0, float(item_data.get("price", 0.0))),
+                vat_rate=vat,
                 print_bon=bool(item_data.get("print_bon", item_data.get("print_receipt", True))),
                 active=bool(item_data.get("active", True)),
             ))
 
-        # Ensure we have 36 slots
+        # Ensure we have all slots
         count = len(menu_data)
-        for i in range(count + 1, 37):
+        for i in range(count + 1, MENU_SLOTS + 1):
             db.add(MenuItem(slot_number=i, name="", price=0.0, active=False))
 
         db.commit()
