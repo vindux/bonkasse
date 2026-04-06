@@ -1,0 +1,52 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<div class="transactions-page">
+
+    <div class="toolbar">
+        <a href="/admin/transactions/export-csv" class="btn btn-accent">Export CSV</a>
+
+        <form method="post" action="/admin/transactions/print-summary" class="inline-form">
+            <input type="date" name="date_filter" class="input-field">
+            <button type="submit" class="btn btn-success">Print Summary</button>
+        </form>
+
+        <form method="post" action="/admin/transactions/delete-all" class="inline-form"
+              onsubmit="return confirm('Delete ALL transactions? This cannot be undone.')">
+            <button type="submit" class="btn btn-danger">Delete All</button>
+        </form>
+    </div>
+
+    {% if transactions %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Date/Time</th>
+                <th>Transaction</th>
+                <th>Item</th>
+                <th>Price</th>
+                <th>VAT %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for txn in transactions %}
+            {% for item in txn.items %}
+            <tr class="{{ 'even' if loop.index0 % 2 == 0 else 'odd' }}">
+                {% if loop.first %}
+                <td rowspan="{{ txn.items|length }}">{{ txn.timestamp.strftime('%Y-%m-%d %H:%M:%S') if txn.timestamp else '' }}</td>
+                <td rowspan="{{ txn.items|length }}">#{{ txn.id }} ({{ "%.2f"|format(txn.total) }}&nbsp;&euro;)</td>
+                {% endif %}
+                <td>{{ item.name }}</td>
+                <td>{{ "%.2f"|format(item.price) }}&nbsp;&euro;</td>
+                <td>{{ "%.1f"|format(item.vat_rate) }}%</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">No transactions recorded.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

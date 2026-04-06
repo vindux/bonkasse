@@ -1,0 +1,58 @@
+<div class="item-card{% if just_saved %} just-saved{% endif %}" id="item-{{ item.id }}">
+
+    <div class="item-card-header">
+        <span class="slot-num">#{{ item.slot_number }}</span>
+        {% if item.is_blank %}
+        <span class="item-status blank">Blank</span>
+        {% elif item.is_empty %}
+        <span class="item-status empty">Empty</span>
+        {% elif not item.active %}
+        <span class="item-status inactive">Inactive</span>
+        {% else %}
+        <span class="item-status active-status">Active</span>
+        {% endif %}
+    </div>
+
+    <form hx-post="/admin/menu-items/{{ item.id }}"
+          hx-swap="none"
+          hx-trigger="change">
+        <div class="form-row">
+            <label>Name</label>
+            <input type="text" name="name" value="{{ item.name }}" class="input-field">
+        </div>
+        <div class="form-row-pair">
+            <div class="form-row">
+                <label>Price (&euro;)</label>
+                <input type="number" name="price" value="{{ '%.2f'|format(item.price) }}"
+                       step="0.01" min="0" class="input-field">
+            </div>
+            <div class="form-row">
+                <label>VAT %</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="vat_rate" value="7.0"
+                               {% if item.vat_rate != 19.0 %}checked{% endif %}>
+                        7%
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="vat_rate" value="19.0"
+                               {% if item.vat_rate == 19.0 %}checked{% endif %}>
+                        19%
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-row-checks">
+            <label class="check-label">
+                <input type="checkbox" name="print_bon" value="true"
+                       {% if item.print_bon %}checked{% endif %}>
+                Print bon
+            </label>
+            <label class="check-label">
+                <input type="checkbox" name="active" value="true"
+                       {% if item.active %}checked{% endif %}>
+                Active
+            </label>
+        </div>
+    </form>
+</div>

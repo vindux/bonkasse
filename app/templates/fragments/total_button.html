@@ -1,0 +1,24 @@
+{% if cart.is_empty %}
+<button class="total-btn disabled" disabled>
+    <span class="total-amount">0.00&nbsp;&euro;</span>
+    <span class="total-label">Print Receipt</span>
+</button>
+{% elif config and config.change_enabled %}
+<button class="total-btn active"
+        id="finalize-btn"
+        hx-get="/change-modal?total={{ '%.2f'|format(cart.total) }}"
+        hx-target="#modal-container"
+        hx-swap="innerHTML">
+    <span class="total-amount">{{ "%.2f"|format(cart.total) }}&nbsp;&euro;</span>
+    <span class="total-label">Print Receipt</span>
+</button>
+{% else %}
+<button class="total-btn active"
+        id="finalize-btn"
+        hx-post="/cart/finalize"
+        hx-target="#cart"
+        hx-swap="innerHTML">
+    <span class="total-amount">{{ "%.2f"|format(cart.total) }}&nbsp;&euro;</span>
+    <span class="total-label">Print Receipt</span>
+</button>
+{% endif %}

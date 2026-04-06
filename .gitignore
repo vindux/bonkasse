@@ -210,3 +210,8 @@ __marimo__/
 .claude/
 CLAUDE.md
 TODO.md
+REVIEW.md
+*.db
+*.db-journal
+*.db-wal
+.idea/

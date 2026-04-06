@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="admin-header">
+        <h1>Bonkasse Settings</h1>
+        <div class="admin-nav">
+            <a href="/admin/menu-items"
+               class="tab{% if active_tab == 'menu-items' %} active{% endif %}">Menu Items</a>
+            <a href="/admin/general"
+               class="tab{% if active_tab == 'general' %} active{% endif %}">General</a>
+            <a href="/admin/transactions"
+               class="tab{% if active_tab == 'transactions' %} active{% endif %}">Transactions</a>
+        </div>
+        <div class="admin-actions">
+            <a href="/admin/back" class="btn btn-accent">Back to Register</a>
+        </div>
+    </div>
+
+    {% if message %}
+    <div class="alert alert-{{ msg_type or 'success' }}">{{ message }}</div>
+    {% endif %}
+
+    <div class="admin-content">
+        {% block admin_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

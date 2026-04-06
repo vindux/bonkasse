@@ -1,0 +1,24 @@
+{% for item in menu_items %}
+<button
+    class="menu-btn{% if item.is_blank %} blank{% elif item.is_empty %} empty{% elif not item.active %} inactive{% endif %}"
+    {% if item.active and not item.is_empty and not item.is_blank %}
+    hx-post="/cart/add/{{ item.id }}"
+    hx-target="#cart"
+    hx-swap="innerHTML"
+    {% else %}
+    disabled
+    {% endif %}
+>
+    <span class="slot-number">{{ item.slot_number }}</span>
+    <span class="item-name">
+        {% if item.is_blank %}
+        {% elif item.is_empty %}[Empty]
+        {% elif not item.active %}{{ item.name }} (Off)
+        {% else %}{{ item.name }}{% endif %}
+    </span>
+    {% if not item.is_empty and not item.is_blank and item.active %}
+    <span class="item-price">{{ "%.2f"|format(item.price) }}&nbsp;&euro;</span>
+    <span class="session-count">{{ session_counts.get(item.id, 0) }}</span>
+    {% endif %}
+</button>
+{% endfor %}

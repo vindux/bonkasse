@@ -1,0 +1,12 @@
+{% if cart.is_empty %}
+<div class="cart-empty">No items yet</div>
+{% else %}
+<ul class="cart-list">
+    {% for item in cart.items %}
+    <li>
+        <span class="cart-item-name">{{ item.name }}</span>
+        <span class="cart-item-price">{{ "%.2f"|format(item.price) }}&nbsp;&euro;</span>
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}

@@ -1,0 +1,188 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<div class="general-page">
+    <div class="general-columns">
+
+        <div class="general-left">
+            <form method="post" action="/admin/general" class="settings-form">
+                <h2>Event</h2>
+                <div class="form-row">
+                    <label>Event Title</label>
+                    <input type="text" name="title" value="{{ config.title or '' }}" class="input-field"
+                           placeholder="e.g. Summer Festival 2026">
+                </div>
+                <!-- hidden fields to preserve other settings -->
+                <input type="hidden" name="company_name" value="{{ config.company_name or '' }}">
+                <input type="hidden" name="company_address" value="{{ config.company_address or '' }}">
+                <input type="hidden" name="company_phone" value="{{ config.company_phone or '' }}">
+                <input type="hidden" name="company_email" value="{{ config.company_email or '' }}">
+                <input type="hidden" name="change_enabled" value="{{ 'true' if config.change_enabled else '' }}">
+                <input type="hidden" name="printer_enabled" value="{{ 'true' if config.printer_enabled else '' }}">
+                <input type="hidden" name="printer_type" value="{{ config.printer_type or 'usb' }}">
+                <input type="hidden" name="printer_interface" value="{{ config.printer_interface or '' }}">
+                <input type="hidden" name="cash_drawer_enabled" value="{{ 'true' if config.cash_drawer_enabled else '' }}">
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+
+            <form method="post" action="/admin/general" class="settings-form">
+                <h2>Business Info</h2>
+                <div class="form-row">
+                    <label>Company Name</label>
+                    <input type="text" name="company_name" value="{{ config.company_name or '' }}" class="input-field">
+                </div>
+                <div class="form-row">
+                    <label>Company Address</label>
+                    <input type="text" name="company_address" value="{{ config.company_address or '' }}" class="input-field">
+                </div>
+                <div class="form-row">
+                    <label>Company Phone</label>
+                    <input type="text" name="company_phone" value="{{ config.company_phone or '' }}" class="input-field">
+                </div>
+                <div class="form-row">
+                    <label>Company Email</label>
+                    <input type="text" name="company_email" value="{{ config.company_email or '' }}" class="input-field">
+                </div>
+                <!-- hidden fields to preserve other settings -->
+                <input type="hidden" name="title" value="{{ config.title or '' }}">
+                <input type="hidden" name="change_enabled" value="{{ 'true' if config.change_enabled else '' }}">
+                <input type="hidden" name="printer_enabled" value="{{ 'true' if config.printer_enabled else '' }}">
+                <input type="hidden" name="printer_type" value="{{ config.printer_type or 'usb' }}">
+                <input type="hidden" name="printer_interface" value="{{ config.printer_interface or '' }}">
+                <input type="hidden" name="cash_drawer_enabled" value="{{ 'true' if config.cash_drawer_enabled else '' }}">
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="general-right">
+            <form method="post" action="/admin/general" class="settings-form">
+                <h2>Change Calculation</h2>
+                <div class="form-row">
+                    <label class="check-label">
+                        <input type="checkbox" name="change_enabled" value="true"
+                               {% if config.change_enabled %}checked{% endif %}>
+                        Show change modal before printing
+                    </label>
+                </div>
+
+                <!-- hidden fields to preserve other settings -->
+                <input type="hidden" name="title" value="{{ config.title or '' }}">
+                <input type="hidden" name="company_name" value="{{ config.company_name or '' }}">
+                <input type="hidden" name="company_address" value="{{ config.company_address or '' }}">
+                <input type="hidden" name="company_phone" value="{{ config.company_phone or '' }}">
+                <input type="hidden" name="company_email" value="{{ config.company_email or '' }}">
+                <input type="hidden" name="printer_enabled" value="{{ 'true' if config.printer_enabled else '' }}">
+                <input type="hidden" name="printer_type" value="{{ config.printer_type or 'usb' }}">
+                <input type="hidden" name="printer_interface" value="{{ config.printer_interface or '' }}">
+                <input type="hidden" name="cash_drawer_enabled" value="{{ 'true' if config.cash_drawer_enabled else '' }}">
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+
+            <form method="post" action="/admin/general" class="settings-form">
+                <h2>Printer Settings</h2>
+                <div class="form-row">
+                    <label class="check-label">
+                        <input type="checkbox" name="printer_enabled" value="true"
+                               {% if config.printer_enabled %}checked{% endif %}>
+                        Enable thermal printer
+                    </label>
+                </div>
+                <div class="form-row">
+                    <label>Printer Type</label>
+                    <select name="printer_type" class="input-field">
+                        <option value="usb"{% if config.printer_type == 'usb' %} selected{% endif %}>USB</option>
+                        <option value="network"{% if config.printer_type == 'network' %} selected{% endif %}>Network</option>
+                        <option value="serial"{% if config.printer_type == 'serial' %} selected{% endif %}>Serial</option>
+                        <option value="windows"{% if config.printer_type == 'windows' %} selected{% endif %}>Windows</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Connection</label>
+                    <input type="text" name="printer_interface" value="{{ config.printer_interface or '' }}"
+                           class="input-field" placeholder="e.g. 04b8:0202 (USB) or 192.168.1.100 (Network)">
+                </div>
+                <div class="form-row">
+                    <label class="check-label">
+                        <input type="checkbox" name="cash_drawer_enabled" value="true"
+                               {% if config.cash_drawer_enabled %}checked{% endif %}>
+                        Open cash drawer on print
+                    </label>
+                </div>
+
+                <!-- hidden fields to preserve other settings -->
+                <input type="hidden" name="title" value="{{ config.title or '' }}">
+                <input type="hidden" name="company_name" value="{{ config.company_name or '' }}">
+                <input type="hidden" name="company_address" value="{{ config.company_address or '' }}">
+                <input type="hidden" name="company_phone" value="{{ config.company_phone or '' }}">
+                <input type="hidden" name="company_email" value="{{ config.company_email or '' }}">
+                <input type="hidden" name="change_enabled" value="{{ 'true' if config.change_enabled else '' }}">
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-accent"
+                            hx-post="/admin/general/printer/test"
+                            hx-target="body">Test Print</button>
+                    <button type="button" class="btn btn-warning"
+                            hx-post="/admin/general/printer/test-drawer"
+                            hx-target="body">Test Drawer</button>
+                </div>
+            </form>
+
+            <div class="settings-form">
+                <h2>Password Protection</h2>
+                <p class="hint">
+                    {% if config.password_hash %}
+                    Password is currently <strong>set</strong>.
+                    {% else %}
+                    No password set. Settings are accessible without login.
+                    {% endif %}
+                </p>
+
+                <form method="post" action="/admin/general/password">
+                    {% if config.password_hash %}
+                    <div class="form-row">
+                        <label>Current Password</label>
+                        <input type="password" name="current_password" class="input-field" required>
+                    </div>
+                    {% endif %}
+                    <div class="form-row">
+                        <label>New Password</label>
+                        <input type="password" name="new_password" class="input-field" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Confirm Password</label>
+                        <input type="password" name="confirm_password" class="input-field" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-accent">
+                            {% if config.password_hash %}Change Password{% else %}Set Password{% endif %}
+                        </button>
+                        {% if config.password_hash %}
+                        </div>
+                </form>
+                <form method="post" action="/admin/general/password/remove" class="mt-12">
+                    <div class="form-row">
+                        <label>Current Password</label>
+                        <input type="password" name="current_password" class="input-field" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-danger">Remove Password</button>
+                    </div>
+                </form>
+                {% else %}
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

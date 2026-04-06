@@ -1,0 +1,23 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<div class="menu-items-page">
+
+    <div class="toolbar">
+        <a href="/admin/menu-items/export/json" class="btn btn-accent">Export JSON</a>
+        <form action="/admin/menu-items/import/json" method="post" enctype="multipart/form-data" class="import-form">
+            <input type="file" name="file" accept=".json" id="import-file" hidden
+                   onchange="this.form.submit()">
+            <label for="import-file" class="btn btn-success">Import JSON</label>
+        </form>
+    </div>
+
+    <div class="items-grid">
+        {% for item in menu_items %}
+        {% with just_saved=false %}
+        {% include "admin/_menu_item_card.html" %}
+        {% endwith %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

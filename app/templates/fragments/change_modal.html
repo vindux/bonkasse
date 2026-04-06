@@ -1,0 +1,31 @@
+<div class="modal-overlay">
+    <div class="modal-content change-modal">
+        <h2 class="change-title">Total: {{ "%.2f"|format(total) }}&nbsp;&euro;</h2>
+
+        {% if notes %}
+        <div class="note-cards">
+            {% for note_value, change_amount in notes %}
+            <div class="note-card">
+                <img src="/static/img/{{ "%02d"|format(note_value) }}.png"
+                     alt="{{ note_value }} EUR" class="note-img">
+                <span class="change-amount">
+                    {% if change_amount == 0 %}Exact{% else %}{{ "%.2f"|format(change_amount) }}&nbsp;&euro;{% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="change-exceed">Amount exceeds largest note denomination</p>
+        {% endif %}
+
+        <button class="btn btn-success btn-large"
+                hx-post="/cart/finalize"
+                hx-target="#cart"
+                hx-swap="innerHTML"
+                onclick="document.getElementById('modal-container').innerHTML=''">
+            Confirm &amp; Print
+        </button>
+
+        <p class="change-hint">Click anywhere outside or press Escape to cancel</p>
+    </div>
+</div>

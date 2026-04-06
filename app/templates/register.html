@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="register-page">
+
+    <div id="menu-grid">
+        {% for item in menu_items %}
+        <button
+            class="menu-btn{% if item.is_blank %} blank{% elif item.is_empty %} empty{% elif not item.active %} inactive{% endif %}"
+            {% if item.active and not item.is_empty and not item.is_blank %}
+            hx-post="/cart/add/{{ item.id }}"
+            hx-target="#cart"
+            hx-swap="innerHTML"
+            {% else %}
+            disabled
+            {% endif %}
+        >
+            <span class="slot-number">{{ item.slot_number }}</span>
+            <span class="item-name">
+                {% if item.is_blank %}
+                {% elif item.is_empty %}[Empty]
+                {% elif not item.active %}{{ item.name }} (Off)
+                {% else %}{{ item.name }}{% endif %}
+            </span>
+            {% if not item.is_empty and not item.is_blank and item.active %}
+            <span class="item-price">{{ "%.2f"|format(item.price) }}&nbsp;&euro;</span>
+            <span class="session-count">{{ session_counts.get(item.id, 0) }}</span>
+            {% endif %}
+        </button>
+        {% endfor %}
+    </div>
+
+    <div id="bottom-bar">
+        <div id="cart-area">
+            <h3>Current Order</h3>
+            <div id="cart">
+                {% include "fragments/cart.html" %}
+            </div>
+        </div>
+
+        <div id="actions">
+            <button class="btn btn-warning"
+                    hx-post="/cart/remove-last"
+                    hx-target="#cart"
+                    hx-swap="innerHTML">Remove Last</button>
+            <button class="btn btn-danger"
+                    hx-post="/cart/clear"
+                    hx-target="#cart"
+                    hx-swap="innerHTML">Clear All</button>
+            <div class="action-spacer"></div>
+            <a href="/admin/login" class="btn btn-system">Settings</a>
+        </div>
+
+        <div id="bottom-spacer"></div>
+
+        <div id="total-area">
+            <div id="total-button">
+                {% include "fragments/total_button.html" %}
+            </div>
+            <div id="last-order" class="last-order-display">&mdash;</div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
