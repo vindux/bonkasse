@@ -8,7 +8,9 @@
         id="finalize-btn"
         hx-post="/cart/finalize"
         hx-target="#cart"
-        hx-swap="innerHTML">
+        hx-swap="innerHTML"
+        hx-disabled-elt="this"
+        hx-sync="this:drop">
     <span class="total-amount">{{ "%.2f"|format(cart.total) }}&nbsp;&euro;</span>
     <span class="total-label">Print Receipt</span>
 </button>

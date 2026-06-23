@@ -1,4 +1,5 @@
 import logging
+import threading
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -16,6 +17,11 @@ log = logging.getLogger(__name__)
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
+
+# Serializes finalize so a double-tap (two concurrent requests for the SAME
+# order) can't create duplicate transactions / double-print. The shared global
+# cart is mutable state with no other synchronization.
+_finalize_lock = threading.Lock()
 
 
 def _get_sales_counts(db: DBSession) -> dict[int, int]:
@@ -103,17 +109,26 @@ def cart_finalize(
     printer: PrinterService = Depends(get_printer_service),
 ):
     cart = get_cart()
-    if cart.is_empty:
-        ctx = _cart_context(db)
-        return HTMLResponse(templates.get_template("fragments/cart.html").render(ctx))
 
-    # Save transaction
+    # Snapshot the order and clear the cart atomically. Doing this under the
+    # lock (and clearing BEFORE we persist/print) means a duplicate request
+    # from a double-tap finds an empty cart and no-ops, instead of creating a
+    # second phantom transaction and re-printing.
+    with _finalize_lock:
+        if cart.is_empty:
+            ctx = _cart_context(db)
+            return HTMLResponse(templates.get_template("fragments/cart.html").render(ctx))
+        items = list(cart.items)
+        last_total = cart.total
+        cart.clear()
+
+    # Save transaction from the snapshot
     try:
-        txn = Transaction(total=cart.total)
+        txn = Transaction(total=last_total)
         db.add(txn)
         db.flush()
 
-        for cart_item in cart.items:
+        for cart_item in items:
             db.add(TransactionItem(
                 transaction_id=txn.id,
                 menu_item_id=cart_item.menu_item_id,
@@ -126,6 +141,10 @@ def cart_finalize(
     except Exception:
         db.rollback()
         log.exception("Failed to save transaction")
+        # Restore the order so the cashier can retry rather than losing it.
+        with _finalize_lock:
+            for cart_item in items:
+                cart.add(cart_item)
         ctx = _cart_context(db)
         cart_html = templates.get_template("fragments/cart.html").render(ctx)
         total_html = templates.get_template("fragments/total_button.html").render(ctx)
@@ -134,7 +153,7 @@ def cart_finalize(
 
     # Print individual bons for items with print_bon enabled
     bon_items = []
-    for cart_item in cart.items:
+    for cart_item in items:
         if cart_item.print_bon:
             bon_items.append({
                 "name": cart_item.name,
@@ -146,9 +165,6 @@ def cart_finalize(
             printer.print_individual_items(bon_items)
         except Exception:
             log.exception("Printer error during finalize")
-
-    last_total = cart.total
-    cart.clear()
 
     # Return updated cart + total + menu grid (sales counts) + last order
     ctx = _cart_context(db)

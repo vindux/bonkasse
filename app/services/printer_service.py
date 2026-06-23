@@ -38,6 +38,10 @@ class PrinterService:
             self._initialize_printer()
 
     def _initialize_printer(self):
+        # Always release any previous handle before opening a new one so
+        # reconfiguring never leaks a connection.
+        self.close()
+
         if not self.printer_enabled:
             self.printer = None
             return False
@@ -94,7 +98,8 @@ class PrinterService:
     def _flush_printer(self):
         if self.printer and self.printer_type == "windows":
             try:
-                self.printer.close()
+                # _initialize_printer() closes the current handle first, then
+                # reopens — which is how Win32Raw actually flushes the spool.
                 self._initialize_printer()
             except Exception as e:
                 self.logger.warning(f"Error flushing printer: {e}")

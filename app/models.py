@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, func
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, DeclarativeBase
 from datetime import datetime
 
@@ -17,8 +17,8 @@ class MenuItem(Base):
     vat_rate = Column(Float, default=7.0)
     print_bon = Column(Boolean, default=True)
     active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     transaction_items = relationship("TransactionItem", back_populates="menu_item")
 
@@ -36,7 +36,10 @@ class Transaction(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     total = Column(Float, nullable=False)
-    timestamp = Column(DateTime, default=func.now())
+    # Use local machine time, not SQLite's func.now() (which stores UTC).
+    # This kiosk runs on a single local machine; receipts/CSV/date-filters
+    # all expect local wall-clock time.
+    timestamp = Column(DateTime, default=datetime.now)
 
     items = relationship("TransactionItem", back_populates="transaction", cascade="all, delete-orphan")
 
@@ -72,5 +75,5 @@ class AppConfig(Base):
     printer_interface = Column(String, default="")
     cash_drawer_enabled = Column(Boolean, default=True)
     password_hash = Column(String, nullable=True)
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
