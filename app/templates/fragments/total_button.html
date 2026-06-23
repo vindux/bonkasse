@@ -1,7 +1,7 @@
 {% if cart.is_empty %}
 <button class="total-btn disabled" disabled>
     <span class="total-amount">0.00&nbsp;&euro;</span>
-    <span class="total-label">Print Receipt</span>
+    <span class="total-label">Charge</span>
 </button>
 {% else %}
 <button class="total-btn active"
@@ -12,6 +12,6 @@
         hx-disabled-elt="this"
         hx-sync="this:drop">
     <span class="total-amount">{{ "%.2f"|format(cart.total) }}&nbsp;&euro;</span>
-    <span class="total-label">Print Receipt</span>
+    <span class="total-label">Charge</span>
 </button>
 {% endif %}

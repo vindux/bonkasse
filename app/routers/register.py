@@ -3,7 +3,7 @@ import threading
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session as DBSession
+from sqlalchemy.orm import Session as DBSession, joinedload
 from sqlalchemy import func
 from pathlib import Path
 
@@ -35,6 +35,33 @@ def _get_sales_counts(db: DBSession) -> dict[int, int]:
     return dict(rows)
 
 
+def _get_last_transaction(db: DBSession) -> Transaction | None:
+    """Most recently finalized transaction (for the customer-receipt reprint)."""
+    return (
+        db.query(Transaction)
+        .options(joinedload(Transaction.items))
+        .order_by(Transaction.id.desc())
+        .first()
+    )
+
+
+def _toast(message: str, type: str = "success") -> HTMLResponse:
+    html = templates.get_template("components/toast.html").render({"message": message, "type": type})
+    return HTMLResponse(html)
+
+
+def _consolidate_items(items) -> list[dict]:
+    """Group identical line items into name/price/quantity rows for a receipt."""
+    consolidated: list[dict] = []
+    for item in items:
+        match = next((c for c in consolidated if c["name"] == item.name and c["price"] == item.price), None)
+        if match:
+            match["quantity"] += 1
+        else:
+            consolidated.append({"name": item.name, "price": item.price, "quantity": 1})
+    return consolidated
+
+
 def _cart_context(db: DBSession) -> dict:
     """Build common context needed for cart/total fragments."""
     cart = get_cart()
@@ -58,6 +85,7 @@ def register_page(
     ctx = _cart_context(db)
     config = ctx["config"]
     ctx["printer_ready"] = printer.is_printer_ready() if config and config.printer_enabled else None
+    ctx["last_transaction"] = _get_last_transaction(db)
     return templates.TemplateResponse(request, name="register.html", context=ctx)
 
 
@@ -172,9 +200,11 @@ def cart_finalize(
     total_html = templates.get_template("fragments/total_button.html").render(ctx)
     grid_html = templates.get_template("fragments/menu_grid.html").render(ctx)
 
+    last_order_html = templates.get_template("fragments/last_order.html").render({"last_transaction": txn})
+
     oob = f'\n<div id="total-button" hx-swap-oob="innerHTML">{total_html}</div>'
     oob += f'\n<div id="menu-grid" hx-swap-oob="innerHTML">{grid_html}</div>'
-    oob += f'\n<div id="last-order" hx-swap-oob="innerHTML">{last_total:.2f}&nbsp;&euro;</div>'
+    oob += f'\n<div id="last-order" hx-swap-oob="innerHTML">{last_order_html}</div>'
 
     # Show change modal if enabled
     config = db.get(AppConfig, 1)
@@ -188,3 +218,26 @@ def cart_finalize(
         oob += f'\n<div id="modal-container" hx-swap-oob="innerHTML">{change_html}</div>'
 
     return HTMLResponse(cart_html + oob)
+
+
+@router.post("/receipt/print-last", response_class=HTMLResponse)
+def print_last_receipt(
+    request: Request,
+    db: DBSession = Depends(get_db),
+    printer: PrinterService = Depends(get_printer_service),
+):
+    """Reprint the most recent finalized order as a consolidated customer receipt."""
+    txn = _get_last_transaction(db)
+    if not txn or not txn.items:
+        return _toast("No previous order to print.", "warning")
+
+    items = _consolidate_items(txn.items)
+    try:
+        ok = printer.print_receipt(items, txn.total)
+    except Exception:
+        log.exception("Failed to print customer receipt")
+        ok = False
+
+    if ok:
+        return _toast("Receipt printed.", "success")
+    return _toast("Could not print receipt. Check the printer.", "error")

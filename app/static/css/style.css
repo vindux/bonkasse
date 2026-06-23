@@ -360,6 +360,12 @@ html, body {
     margin-top: 4px;
 }
 
+#last-order {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
 .last-order-display {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
@@ -368,6 +374,19 @@ html, body {
     text-align: center;
     font-size: 13px;
     color: var(--text-secondary);
+}
+
+.btn-receipt {
+    width: 100%;
+    background: var(--accent);
+    padding: 14px;
+    font-size: 15px;
+}
+.btn-receipt:hover { background: var(--accent-hover); }
+.btn-receipt:disabled {
+    background: var(--bg-accent);
+    color: var(--text-secondary);
+    cursor: default;
 }
 
 /* ---- Modal ---- */
