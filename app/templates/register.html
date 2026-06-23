@@ -24,6 +24,12 @@
                     hx-post="/cart/clear"
                     hx-target="#cart"
                     hx-swap="innerHTML">Clear All</button>
+            <button class="btn btn-accent"
+                    hx-post="/receipt/print-last"
+                    hx-target="#toast-container"
+                    hx-swap="innerHTML"
+                    hx-disabled-elt="this"
+                    hx-sync="this:drop">Print Receipt</button>
             <div class="action-spacer"></div>
             {% if printer_ready is not none %}
             <span class="printer-status {% if printer_ready %}ready{% else %}offline{% endif %}"
@@ -38,7 +44,7 @@
             <div id="total-button">
                 {% include "fragments/total_button.html" %}
             </div>
-            <div id="last-order">
+            <div id="last-order" class="last-order-display">
                 {% include "fragments/last_order.html" %}
             </div>
         </div>

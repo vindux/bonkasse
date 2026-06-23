@@ -1,13 +1,2 @@
-<div class="last-order-display">
-    Last order:
-    {% if last_transaction %}{{ "%.2f"|format(last_transaction.total) }}&nbsp;&euro;{% else %}&mdash;{% endif %}
-</div>
-<button class="btn btn-receipt"
-        hx-post="/receipt/print-last"
-        hx-target="#toast-container"
-        hx-swap="innerHTML"
-        hx-disabled-elt="this"
-        hx-sync="this:drop"
-        {% if not last_transaction %}disabled{% endif %}>
-    Print Receipt
-</button>
+Last order:
+{% if last_transaction %}{{ "%.2f"|format(last_transaction.total) }}&nbsp;&euro;{% else %}&mdash;{% endif %}
