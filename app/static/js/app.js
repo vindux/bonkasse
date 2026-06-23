@@ -1,26 +1,35 @@
 /* Bonkasse - Keyboard shortcuts and UI helpers */
 
-/* Keyboard shortcuts for register page */
+/* On the register page a tapped button must NOT keep keyboard focus.
+   Otherwise a focused <button> gets re-triggered by Space/Enter, which would
+   re-add the last item. Blur it the moment it gains focus (the click itself
+   still goes through). */
+document.addEventListener("focusin", function (e) {
+    if (!document.getElementById("register-page")) return;
+    var t = e.target;
+    if (t && t.tagName === "BUTTON" && typeof t.blur === "function") {
+        t.blur();
+    }
+});
+
+/* Register page keyboard: ONLY Enter does anything (print the bons).
+   Every other key is swallowed so nothing else can affect the cart. */
 document.addEventListener("keydown", function (e) {
-    /* Only on register page */
     if (!document.getElementById("register-page")) return;
 
-    /* Skip shortcuts if change modal is showing (any key dismisses it instead) */
+    /* Change modal handles its own keys (any key dismisses it). */
     if (document.getElementById("change-overlay")) return;
 
-    /* Enter = finalize (print receipt) */
     if (e.key === "Enter") {
+        e.preventDefault();
         var btn = document.getElementById("finalize-btn");
         if (btn && !btn.disabled) {
             btn.click();
         }
+        return;
     }
 
-    /* Backspace = remove last item */
-    if (e.key === "Backspace") {
-        e.preventDefault();
-        htmx.ajax("POST", "/cart/remove-last", { target: "#cart", swap: "innerHTML" });
-    }
+    e.preventDefault();
 });
 
 /* Close change modal on ANY click or keypress */
