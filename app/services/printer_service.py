@@ -165,6 +165,23 @@ class PrinterService:
             self.printer.set(align="right", width=2, height=2)
             self.printer.text(f"TOTAL: {total:.2f} \u20ac\n")
 
+            vat_groups: dict[float, float] = {}
+            for item in items:
+                rate = item.get("vat_rate", 0.0) or 0.0
+                if rate > 0:
+                    gross = item.get("price", 0.0) * item.get("quantity", 1)
+                    vat_groups[rate] = vat_groups.get(rate, 0.0) + gross * rate / (100 + rate)
+            if vat_groups:
+                self.printer.set(align="right")
+                for rate, vat_amount in sorted(vat_groups.items()):
+                    net = sum(
+                        item.get("price", 0.0) * item.get("quantity", 1)
+                        for item in items
+                        if (item.get("vat_rate") or 0.0) == rate
+                    ) - vat_amount
+                    self.printer.text(f"Net ({rate:g}%): {net:.2f} \u20ac\n")
+                    self.printer.text(f"incl. {rate:g}% VAT: {vat_amount:.2f} \u20ac\n")
+
             if payment_amount is not None:
                 self.printer.set(align="right")
                 self.printer.text(f"Payment: {payment_amount:.2f} \u20ac\n")
@@ -303,6 +320,20 @@ class PrinterService:
                 print(f"{name:<25} {price:>6.2f} \u20ac")
         print(f"{'-' * 40}")
         print(f"{'TOTAL':<25} {total:>6.2f} \u20ac")
+        vat_groups: dict[float, float] = {}
+        for item in items:
+            rate = item.get("vat_rate", 0.0) or 0.0
+            if rate > 0:
+                gross = item.get("price", 0.0) * item.get("quantity", 1)
+                vat_groups[rate] = vat_groups.get(rate, 0.0) + gross * rate / (100 + rate)
+        for rate, vat_amount in sorted(vat_groups.items()):
+            net = sum(
+                item.get("price", 0.0) * item.get("quantity", 1)
+                for item in items
+                if (item.get("vat_rate") or 0.0) == rate
+            ) - vat_amount
+            print(f"  Net ({rate:g}%): {net:.2f} \u20ac")
+            print(f"  incl. {rate:g}% VAT: {vat_amount:.2f} \u20ac")
         if payment_amount is not None:
             print(f"{'Payment':<25} {payment_amount:>6.2f} \u20ac")
         if change is not None and change > 0:

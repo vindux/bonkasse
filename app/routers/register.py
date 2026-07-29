@@ -58,7 +58,7 @@ def _consolidate_items(items) -> list[dict]:
         if match:
             match["quantity"] += 1
         else:
-            consolidated.append({"name": item.name, "price": item.price, "quantity": 1})
+            consolidated.append({"name": item.name, "price": item.price, "quantity": 1, "vat_rate": item.vat_rate})
     return consolidated
 
 
