@@ -214,4 +214,5 @@ REVIEW.md
 *.db
 *.db-journal
 *.db-wal
+*.db-shm
 .idea/

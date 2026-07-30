@@ -12,6 +12,22 @@ from .auth import _AdminRedirectException
 from .config import MENU_SLOTS
 
 
+class NoCacheStaticFiles(StaticFiles):
+    """Static files that always revalidate.
+
+    Starlette sends ETag/Last-Modified but no Cache-Control, so the kiosk browser
+    invents its own freshness window and keeps serving a stale style.css long after
+    it changed on disk. "no-cache" means "revalidate before reusing", not "don't
+    store" — the ETag still turns an unchanged file into an empty 304, which costs
+    nothing over loopback.
+    """
+
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 def create_app() -> FastAPI:
     app = FastAPI(title="Bonkasse", docs_url=None, redoc_url=None)
 
@@ -20,7 +36,7 @@ def create_app() -> FastAPI:
         return RedirectResponse("/admin/login", status_code=303)
 
     static_dir = Path(__file__).parent / "static"
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+    app.mount("/static", NoCacheStaticFiles(directory=str(static_dir)), name="static")
 
     from .routers import register, admin, admin_menu, admin_general, admin_transactions
     app.include_router(register.router)
