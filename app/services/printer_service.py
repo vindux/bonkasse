@@ -191,9 +191,6 @@ class PrinterService:
             self._print_footer()
             self.printer.cut()
 
-            if self.cash_drawer_enabled:
-                self._open_cash_drawer()
-
             self._flush_printer()
             self.logger.info("Receipt printed successfully")
             return True

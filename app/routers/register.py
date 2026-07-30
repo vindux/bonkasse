@@ -194,6 +194,12 @@ def cart_finalize(
         except Exception:
             log.exception("Printer error during finalize")
 
+    # The sale is committed and cash is changing hands, so open the till. This
+    # sits outside the `if bon_items:` block on purpose — an order with nothing
+    # printable is still a cash sale. The call is a no-op when the drawer is
+    # switched off in settings or the printer is unavailable.
+    printer._open_cash_drawer()
+
     # Return updated cart + total + menu grid (sales counts) + last order
     ctx = _cart_context(db)
     cart_html = templates.get_template("fragments/cart.html").render(ctx)
